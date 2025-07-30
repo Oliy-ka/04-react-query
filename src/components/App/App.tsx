@@ -1,7 +1,6 @@
 import SearchBar from '../SearchBar/SearchBar'
 import { Toaster } from 'react-hot-toast'
 import toast from 'react-hot-toast';
-import axios from 'axios';
 import type { Movie } from '../../types/movie';
 import { useState } from 'react';
 import MovieGrid from '../MovieGrid/MovieGrid';
@@ -9,10 +8,11 @@ import css from "./App.module.css";
 import Loader from '../Loader/Loader';
 import ErrorMessage from '../ErrorMessage/ErrorMessage';
 import MovieModal from '../MovieModal/MovieModal';
+import { fetchMovies } from '../../services/movieService';
+
 
 function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
-  const apiKey = import.meta.env.VITE_TMDB_TOKEN;
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -38,28 +38,11 @@ function App() {
     setMovies([]);
     setIsLoading(true);
     setIsError(false);
-    const options = {
-      method: 'GET',
-      url: 'https://api.themoviedb.org/3/search/movie',
-      params: {
-        query: newQuery,
-        include_adult: false,
-        language: 'en-US',
-        page: 1
-      },
-      headers: {
-        accept: 'application/json',
-        Authorization: `Bearer ${apiKey}`
-      }
-    };
-
-    axios
-      .request(options)
-      .then(res => {
+    fetchMovies({ query: newQuery })
+      .then(data => {
         setIsLoading(false);
-        setMovies(res.data.results);
-        console.log(res.data);
-        if (res.data.results.length === 0) {
+        setMovies(data.results);
+        if (data.results.length === 0) {
           toast.error('No movies found for your request.');
         }
       })
@@ -71,7 +54,6 @@ function App() {
         setIsLoading(false);
       });
   }
-
 
   return (
     <div className={css.app}>
