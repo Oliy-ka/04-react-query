@@ -1,7 +1,7 @@
 import SearchBar from '../SearchBar/SearchBar'
-import { Toaster } from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
 import type { Movie } from '../../types/movie';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import MovieGrid from '../MovieGrid/MovieGrid';
 import css from "./App.module.css";
 import Loader from '../Loader/Loader';
@@ -44,8 +44,15 @@ function App() {
     setIsModalOpen(false);
   };
 
+  useEffect(() => {
+  if (isSuccess && movies.length === 0) {
+    toast("Opps...No movies found");
+  }
+}, [isSuccess, movies]);
+
   const handleSearch = (newQuery: string) => {
     setQuery(newQuery);
+    setCurrentPage(1);
   }
 
   return (
@@ -65,10 +72,7 @@ function App() {
           previousLabel="←"
         />
       )}
-      <MovieGrid 
-        movies={movies} 
-        onSelect={openModal} 
-      />
+      {isSuccess && movies.length > 0 && (<MovieGrid movies={movies} onSelect={openModal} />)}
       {isLoading && <Loader />}
       {isError && <ErrorMessage />}
       {isModalOpen && selectedMovie && ( <MovieModal onClose={closeModal} movie={selectedMovie} />)}
