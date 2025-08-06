@@ -45,10 +45,10 @@ function App() {
   };
 
   useEffect(() => {
-  if (isSuccess && movies.length === 0) {
+  if (isSuccess && data?.results?.length === 0) {
     toast("Opps...No movies found");
   }
-}, [isSuccess, movies]);
+}, [isSuccess, data]);
 
   const handleSearch = (newQuery: string) => {
     setQuery(newQuery);
